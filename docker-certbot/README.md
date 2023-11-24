@@ -12,3 +12,4 @@ This also creates two directories in the directory where the command gets execut
 When the command above gets executed, it will ask for some information, such as email address and domain name(s) to be included in the certificate. The DNS challenge will be used to verify that you are the owner of the domain(s). This means you will have to deploy a DNS TXT record to the `_acme-challenge.yourdomain.xyz` subdomain(s)
 ## When to use this?
 This is useful for when you want to deploy a certificate on a machine which serves some content and accepts generated certificates, but doesn't allow you to install Certbot on it. Some applications generate certificates automatically, however only for specific records, such as `sub.domain.xyz`, but do not allow for generation of wildcard certificates, such as `*.domain.xyz`.
+## Documentation [here](https://eff-certbot.readthedocs.io/en/latest/install.html#alternative-1-docker)
