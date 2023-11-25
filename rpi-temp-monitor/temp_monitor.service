@@ -1,0 +1,12 @@
+[Unit]
+Description=Temperature Monitoring Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /etc/customscripts/temp_monitor.py
+User=root
+Group=root
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
