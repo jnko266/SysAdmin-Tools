@@ -8,6 +8,10 @@ import re
 # Database setup
 db_name = '/mnt/data/temp_readings.sqlite'
 
+# Deletion settings
+days_to_keep = 365 # Change this to specify the number of days to keep data
+delete_old_records = 1  # Set to 1 to enable deletion of old records
+
 # Create a connection to the SQLite database
 conn = sqlite3.connect(db_name)
 cursor = conn.cursor()
@@ -23,12 +27,37 @@ CREATE TABLE IF NOT EXISTS temperature_readings (
 );
 """
 
-# Execute the query
+# Create an index on the timestamp column for faster deletes
+create_index_query = """
+CREATE INDEX IF NOT EXISTS idx_timestamp ON temperature_readings(timestamp);
+"""
+
+# Execute the queries
 cursor.execute(create_table_query)
+cursor.execute(create_index_query)
 
 # Commit the changes and close the connection
 conn.commit()
 conn.close()
+
+def delete_old_data():
+    """Function to delete data older than specified number of days."""
+    try:
+        conn = sqlite3.connect(db_name)
+        cursor = conn.cursor()
+
+        delete_query = """
+        DELETE FROM temperature_readings 
+        WHERE timestamp < datetime('now', '-{} days');
+        """.format(days_to_keep)
+
+        cursor.execute(delete_query)
+        conn.commit()
+    except Exception as e:
+        print(f"Error deleting old data: {e}")
+    finally:
+        if conn:
+            conn.close()
 
 def collect_data():
     """Function to collect data from system commands and save to SQLite DB."""
@@ -38,6 +67,10 @@ def collect_data():
         cursor = conn.cursor()
 
         while True:
+            # Delete old data if enabled
+            if delete_old_records:
+                delete_old_data()
+            
             # Generate a new UUID for each record
             record_id = str(uuid.uuid4())
              
